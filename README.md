@@ -49,4 +49,21 @@ swift test
 ./scripts/build-app.sh         # -> build/ScreenOff.app
 ```
 
+## Release
+
+Builds a universal, Developer ID-signed, notarized DMG and publishes it as a GitHub release tagged from `CFBundleShortVersionString`.
+
+```bash
+# one-time: store notarization credentials (app-specific password from appleid.apple.com)
+xcrun notarytool store-credentials ScreenOff --apple-id <apple-id> --team-id 297W77MNZY
+
+./scripts/release.sh
+```
+
+`SKIP_NOTARIZE=1 PUBLISH=0 ./scripts/release.sh` builds and signs the DMG locally without notarizing or publishing.
+
+Not App Store eligible: there is no public API for disabling a display.
+
+## Notes
+
 Display control uses the private `CGSConfigureDisplayEnabled` (SkyLight), resolved at runtime.
