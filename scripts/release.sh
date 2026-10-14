@@ -32,9 +32,10 @@ BIN="$(swift build -c release "${ARCHS[@]}" --show-bin-path)/ScreenOff"
 
 echo "==> Assembling and signing app"
 rm -rf "$OUT"
-mkdir -p "$APP/Contents/MacOS"
+mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
 cp "$BIN" "$APP/Contents/MacOS/ScreenOff"
 cp Resources/Info.plist "$APP/Contents/Info.plist"
+cp Resources/AppIcon.icns "$APP/Contents/Resources/AppIcon.icns"
 codesign --force --options runtime --timestamp --sign "$IDENTITY" "$APP"
 codesign --verify --strict --verbose=2 "$APP"
 

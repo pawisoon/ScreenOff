@@ -1,3 +1,5 @@
+<img src="Resources/AppIcon.png" width="128" alt="ScreenOff icon">
+
 # ScreenOff
 
 Menu bar app + CLI for turning individual displays off on macOS — no backlight, no power cut.
@@ -47,6 +49,7 @@ swift build
 swift test
 .build/debug/ScreenOff list
 ./scripts/build-app.sh         # -> build/ScreenOff.app
+swift scripts/make-icon.swift  # regenerate Resources/AppIcon.icns
 ```
 
 ## Release

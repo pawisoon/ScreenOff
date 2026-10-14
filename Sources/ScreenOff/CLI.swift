@@ -32,7 +32,7 @@ enum CLI {
                 if targets.isEmpty {
                     let failures = DisplayController.enableAll()
                     for (d, error) in failures { printErr("\(d.name): \(error.localizedDescription)") }
-                    if displaysOff.isEmpty, failures.isEmpty { print("All displays are on.") }
+                    if failures.isEmpty { print("All displays are on.") }
                     return failures.isEmpty ? 0 : 1
                 }
                 try apply(targets, enabled: { _ in true })
@@ -54,8 +54,6 @@ enum CLI {
         }
         return 0
     }
-
-    private static var displaysOff: [Display] { DisplayController.displays().filter { !$0.isEnabled } }
 
     private static func list() {
         let displays = DisplayController.displays()

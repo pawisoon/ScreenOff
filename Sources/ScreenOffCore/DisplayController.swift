@@ -15,20 +15,29 @@ public enum DisplayController {
 
     /// Active displays plus the ones ScreenOff has turned off. Main display first.
     public static func displays() -> [Display] {
+        // CoreGraphics is the source of truth: NSScreen.screens is only refreshed when the run loop
+        // handles the screen-change notification, so right after a toggle it can list a display
+        // that is already off (or miss one that is back on). Use it for names only.
+        var names: [CGDirectDisplayID: String] = [:]
+        for screen in NSScreen.screens {
+            if let n = screen.deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")] as? NSNumber {
+                names[n.uint32Value] = screen.localizedName
+            }
+        }
+        var store = DisabledStore.load()
         let mainID = CGMainDisplayID()
-        let active: [Display] = NSScreen.screens.compactMap { screen in
-            guard let number = screen.deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")] as? NSNumber else { return nil }
-            let id = number.uint32Value
-            return Display(id: id, name: screen.localizedName, isBuiltin: CGDisplayIsBuiltin(id) != 0,
+        let active: [Display] = activeIDs().map { id in
+            let name = names[id] ?? store.first { $0.id == id }?.name ?? "Display \(id)"
+            return Display(id: id, name: name, isBuiltin: CGDisplayIsBuiltin(id) != 0,
                            isMain: id == mainID, isEnabled: true)
         }
         .sorted { ($0.isMain ? 0 : 1, $0.id) < ($1.isMain ? 0 : 1, $1.id) }
 
         // A display that came back on its own (replugged, reboot) no longer counts as off.
-        let activeIDs = Set(active.map(\.id))
-        var store = DisabledStore.load()
-        store.removeAll { activeIDs.contains($0.id) }
-        DisabledStore.save(store)
+        let activeSet = Set(active.map(\.id))
+        let before = store.count
+        store.removeAll { activeSet.contains($0.id) }
+        if store.count != before { DisabledStore.save(store) }
 
         let disabled = store.map {
             Display(id: $0.id, name: $0.name, isBuiltin: $0.isBuiltin, isMain: false, isEnabled: false)
@@ -41,7 +50,7 @@ public enum DisplayController {
         if !enabled, displays().filter(\.isEnabled).count <= 1 {
             throw ScreenOffError.lastActiveDisplay
         }
-        try configure(display, enabled)
+        try configure(id: display.id, name: display.name, enabled: enabled)
 
         var store = DisabledStore.load()
         store.removeAll { $0.id == display.id }
@@ -52,6 +61,10 @@ public enum DisplayController {
     }
 
     /// Turns every display ScreenOff disabled back on. Returns the ones that failed.
+    ///
+    /// Disabled displays vanish from every public CoreGraphics list, so if the record of what we
+    /// turned off is lost, nothing could find them again. As a rescue, also try to enable every
+    /// low display ID that isn't online (Apple Silicon numbers displays 1, 2, 3...).
     @discardableResult
     public static func enableAll() -> [(Display, Error)] {
         var failures: [(Display, Error)] = []
@@ -66,6 +79,10 @@ public enum DisplayController {
                 DisabledStore.save(store)
             }
         }
+        let online = Set(onlineIDs())
+        for id in CGDirectDisplayID(1)...32 where !online.contains(id) {
+            try? configure(id: id, name: "Display \(id)", enabled: true)
+        }
         return failures
     }
 
@@ -78,17 +95,34 @@ public enum DisplayController {
         p.waitUntilExit()
     }
 
-    private static func configure(_ display: Display, _ enabled: Bool) throws {
+    private static func configure(id: CGDirectDisplayID, name: String, enabled: Bool) throws {
         guard let configureDisplayEnabled else { throw ScreenOffError.apiUnavailable }
         var config: CGDisplayConfigRef?
         var err = CGBeginDisplayConfiguration(&config)
-        guard err == .success else { throw ScreenOffError.configurationFailed(display.name, err.rawValue) }
-        err = configureDisplayEnabled(config, display.id, enabled)
+        guard err == .success else { throw ScreenOffError.configurationFailed(name, err.rawValue) }
+        err = configureDisplayEnabled(config, id, enabled)
         guard err == .success else {
             CGCancelDisplayConfiguration(config)
-            throw ScreenOffError.configurationFailed(display.name, err.rawValue)
+            throw ScreenOffError.configurationFailed(name, err.rawValue)
         }
         err = CGCompleteDisplayConfiguration(config, .permanently)
-        guard err == .success else { throw ScreenOffError.configurationFailed(display.name, err.rawValue) }
+        guard err == .success else { throw ScreenOffError.configurationFailed(name, err.rawValue) }
+    }
+
+    private static func activeIDs() -> [CGDirectDisplayID] {
+        displayList(CGGetActiveDisplayList)
+    }
+
+    private static func onlineIDs() -> [CGDirectDisplayID] {
+        displayList(CGGetOnlineDisplayList)
+    }
+
+    private static func displayList(
+        _ get: (UInt32, UnsafeMutablePointer<CGDirectDisplayID>?, UnsafeMutablePointer<UInt32>?) -> CGError
+    ) -> [CGDirectDisplayID] {
+        var ids = [CGDirectDisplayID](repeating: 0, count: 32)
+        var count: UInt32 = 0
+        guard get(UInt32(ids.count), &ids, &count) == .success else { return [] }
+        return Array(ids.prefix(Int(count)))
     }
 }

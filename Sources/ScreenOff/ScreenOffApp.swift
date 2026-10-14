@@ -114,8 +114,8 @@ struct MenuContent: View {
 
         Button("Turn Off External Displays") { model.turnOffExternals() }
             .disabled(model.activeExternals.isEmpty || !model.hasActiveBuiltin)
+        // Always enabled: it also rescues displays that are off but no longer tracked.
         Button("Turn All Displays On") { model.turnAllOn() }
-            .disabled(!model.anyOff)
         Button("Sleep All Displays") { model.sleepAll() }
 
         Divider()
