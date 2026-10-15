@@ -24,6 +24,7 @@ Remove with `./scripts/uninstall.sh`.
 
 - Toggle each display on/off (the last active display can't be turned off).
 - Turn off all external displays / turn everything back on.
+- Speaker volume slider for monitors that support DDC volume (e.g. LG over HDMI/DisplayPort, where macOS greys out the volume control).
 - Sleep all displays (same as `pmset displaysleepnow`).
 - Launch at login.
 
@@ -38,6 +39,8 @@ screenoff off lg studio        # several at once
 screenoff on                   # everything back on
 screenoff toggle 3             # by ID from `list`
 screenoff sleep                # sleep all displays
+screenoff volume lg            # monitor speaker volume over DDC
+screenoff volume lg 40         # set (also +10 / -10)
 ```
 
 The CLI and the menu bar app share state (`~/Library/Application Support/ScreenOff/disabled.json`), so either can turn back on what the other turned off.
