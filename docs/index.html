@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ScreenOff</title>
-<meta name="description" content="Turn individual displays off on your Mac from the menu bar or the command line.">
+<meta name="description" content="Turn individual displays off on your Mac from the menu bar or the command line. Charging and USB-C keep working.">
 <meta property="og:title" content="ScreenOff">
-<meta property="og:description" content="Turn individual displays off on your Mac from the menu bar or the command line.">
+<meta property="og:description" content="Turn individual displays off on your Mac from the menu bar or the command line. Charging and USB-C keep working.">
 <meta property="og:image" content="icon.png">
 <link rel="icon" href="favicon.png">
 <style>
@@ -19,6 +19,21 @@
   --accent: #0071e3;
   --accent-text: #fff;
   --code: #f5f5f7;
+
+  --panel: rgba(246, 246, 248, 0.82);
+  --panel-text: #1d1d1f;
+  --panel-muted: #86868b;
+  --panel-line: rgba(0, 0, 0, 0.1);
+  --panel-shadow: 0 0 0 0.5px rgba(0, 0, 0, 0.18), 0 18px 50px rgba(0, 0, 0, 0.25);
+  --switch-off: rgba(0, 0, 0, 0.12);
+  --chip-off: rgba(0, 0, 0, 0.08);
+  --menubar: rgba(255, 255, 255, 0.55);
+  --wall: linear-gradient(160deg, #8ec5fc 0%, #b8a6f5 45%, #f3b1c8 100%);
+  --term: #fff;
+  --term-bar: #ececee;
+  --device: #c9c9ce;
+  --screen-on: linear-gradient(160deg, #8ec5fc, #b8a6f5 55%, #f3b1c8);
+  --screen-off: #0b0b0c;
 }
 @media (prefers-color-scheme: dark) {
   :root {
@@ -30,6 +45,21 @@
     --accent: #2997ff;
     --accent-text: #fff;
     --code: #1c1c1e;
+
+    --panel: rgba(40, 40, 44, 0.8);
+    --panel-text: #f5f5f7;
+    --panel-muted: #98989d;
+    --panel-line: rgba(255, 255, 255, 0.1);
+    --panel-shadow: 0 0 0 0.5px rgba(255, 255, 255, 0.15), 0 18px 50px rgba(0, 0, 0, 0.6);
+    --switch-off: rgba(255, 255, 255, 0.16);
+    --chip-off: rgba(255, 255, 255, 0.1);
+    --menubar: rgba(30, 30, 34, 0.5);
+    --wall: linear-gradient(160deg, #1e2a5a 0%, #3b2a6b 50%, #6b2f5b 100%);
+    --term: #1c1c1e;
+    --term-bar: #2c2c2e;
+    --device: #48484d;
+    --screen-on: linear-gradient(160deg, #1e2a5a, #3b2a6b 55%, #6b2f5b);
+    --screen-off: #050506;
   }
 }
 * { box-sizing: border-box; }
@@ -43,11 +73,13 @@ body {
 a { color: var(--accent); text-decoration: none; }
 a:hover { text-decoration: underline; }
 .wrap { max-width: 980px; margin: 0 auto; padding: 0 20px; }
+svg.i { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; flex: none; }
 
 header {
   background: var(--band);
   text-align: center;
-  padding: 72px 0 64px;
+  padding: 72px 0 0;
+  overflow: hidden;
 }
 header img { width: 128px; height: 128px; }
 h1 {
@@ -72,6 +104,145 @@ h1 {
 .sub { margin-top: 14px; font-size: 15px; color: var(--muted); }
 .sub a { margin: 0 6px; }
 
+/* Desktop mock with the menu bar panel */
+.desktop {
+  position: relative;
+  margin: 56px auto 0;
+  max-width: 820px;
+  height: 440px;
+  border-radius: 14px 14px 0 0;
+  background: var(--wall);
+  text-align: left;
+  overflow: hidden;
+}
+.menubar {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 16px;
+  height: 26px;
+  padding: 0 14px;
+  background: var(--menubar);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  color: var(--panel-text);
+  font-size: 13px;
+  font-weight: 500;
+}
+.menubar .item { display: flex; align-items: center; }
+.menubar .item svg.i { font-size: 15px; }
+.menubar .active {
+  background: rgba(127, 127, 127, 0.28);
+  border-radius: 5px;
+  padding: 2px 6px;
+  margin: 0 -6px;
+}
+.desktop .panel {
+  position: absolute;
+  top: 32px;
+  right: 120px;
+}
+
+.panel {
+  width: 300px;
+  padding: 10px;
+  border-radius: 12px;
+  background: var(--panel);
+  backdrop-filter: blur(30px) saturate(1.6);
+  -webkit-backdrop-filter: blur(30px) saturate(1.6);
+  box-shadow: var(--panel-shadow);
+  color: var(--panel-text);
+  font-size: 13px;
+  line-height: 1.25;
+  text-align: left;
+}
+.panel .head {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--panel-muted);
+  padding: 0 8px 4px;
+}
+.panel .row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 8px;
+}
+.panel .chip {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  font-size: 15px;
+}
+.panel .chip.off { background: var(--chip-off); color: var(--panel-muted); }
+.panel .name { flex: 1; min-width: 0; }
+.panel .name b { display: block; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.panel .name small { font-size: 11px; color: var(--panel-muted); }
+.switch {
+  position: relative;
+  width: 26px;
+  height: 15px;
+  border-radius: 8px;
+  background: var(--accent);
+  flex: none;
+}
+.switch::after {
+  content: "";
+  position: absolute;
+  top: 1.5px;
+  left: 12.5px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+.switch.off { background: var(--switch-off); }
+.switch.off::after { left: 1.5px; }
+.panel .vol {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 8px 5px 46px;
+  color: var(--panel-muted);
+}
+.panel .vol svg.i { color: var(--panel-text); font-size: 14px; }
+.slider {
+  position: relative;
+  flex: 1;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--switch-off);
+}
+.slider span {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: 2px;
+  background: var(--accent);
+}
+.slider span::after {
+  content: "";
+  position: absolute;
+  right: -7px;
+  top: -5px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 0 0.5px rgba(0, 0, 0, 0.2), 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+.panel .vol em { font-style: normal; font-size: 11px; width: 24px; text-align: right; font-variant-numeric: tabular-nums; }
+.panel hr { border: 0; border-top: 1px solid var(--panel-line); margin: 6px 8px; }
+.panel .action { display: flex; align-items: center; gap: 8px; padding: 5px 8px; border-radius: 6px; }
+.panel .action svg.i { width: 20px; font-size: 15px; }
+.panel .action.hover { background: rgba(127, 127, 127, 0.18); }
+.panel .action .key { margin-left: auto; color: var(--panel-muted); }
+.panel .action .switch { margin-left: auto; }
+
 .cols {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -90,6 +261,7 @@ h3.title {
   letter-spacing: -0.01em;
   margin: 0 0 40px;
 }
+.lead { text-align: center; color: var(--muted); max-width: 620px; margin: -24px auto 40px; }
 
 .grid {
   display: grid;
@@ -108,16 +280,59 @@ h3.title {
 }
 .card p { margin: 0; color: var(--muted); font-size: 15px; }
 
-pre {
-  background: var(--code);
-  border-radius: 14px;
-  padding: 20px 24px;
-  overflow-x: auto;
-  font: 14px/1.6 ui-monospace, "SF Mono", Menlo, monospace;
-  margin: 0 auto;
-  max-width: 640px;
+/* Charging illustration */
+.power {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 48px;
+  align-items: center;
 }
-pre .c { color: var(--muted); }
+.power h3.title { text-align: left; margin-bottom: 16px; }
+.power p { color: var(--muted); margin: 0 0 14px; }
+.power ul { margin: 0; padding: 0; list-style: none; }
+.power li { display: flex; gap: 10px; align-items: center; padding: 6px 0; }
+.power li svg.i { color: #34c759; font-size: 18px; }
+.scene { width: 100%; height: auto; display: block; }
+.scene .dev { fill: var(--device); }
+.scene .off { fill: var(--screen-off); }
+.scene .cable { stroke: var(--device); stroke-width: 5; fill: none; stroke-linecap: round; }
+.scene .flow { stroke: #34c759; stroke-width: 3; fill: none; stroke-linecap: round; stroke-dasharray: 6 10; animation: flow 1.2s linear infinite; }
+.scene .tag { fill: var(--bg); stroke: var(--line); }
+.scene text { fill: var(--text); font: 600 13px -apple-system, BlinkMacSystemFont, sans-serif; }
+.scene .faint { fill: var(--muted); font-weight: 500; font-size: 12px; }
+@keyframes flow { to { stroke-dashoffset: -16; } }
+@media (prefers-reduced-motion: reduce) { .scene .flow { animation: none; } }
+
+/* Terminal mock */
+.term {
+  max-width: 640px;
+  margin: 0 auto;
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--term);
+  box-shadow: 0 0 0 0.5px rgba(127, 127, 127, 0.35), 0 16px 40px rgba(0, 0, 0, 0.18);
+}
+.term .bar {
+  position: relative;
+  height: 30px;
+  background: var(--term-bar);
+  text-align: center;
+  font-size: 12px;
+  line-height: 30px;
+  color: var(--muted);
+}
+.term .dots { position: absolute; left: 12px; top: 10px; display: flex; gap: 8px; }
+.term .dots i { width: 12px; height: 12px; border-radius: 50%; background: #ff5f57; }
+.term .dots i:nth-child(2) { background: #febc2e; }
+.term .dots i:nth-child(3) { background: #28c840; }
+pre {
+  margin: 0;
+  padding: 18px 22px 22px;
+  overflow-x: auto;
+  font: 13.5px/1.65 ui-monospace, "SF Mono", Menlo, monospace;
+}
+pre .p { color: #34c759; }
+pre .o { color: var(--muted); }
 .note { text-align: center; color: var(--muted); font-size: 15px; max-width: 640px; margin: 20px auto 0; }
 
 .sponsor { text-align: center; }
@@ -135,13 +350,32 @@ footer a { color: var(--muted); margin: 0 8px; }
 
 @media (max-width: 760px) {
   h1 { font-size: 42px; }
-  .cols, .grid { grid-template-columns: 1fr; }
+  .cols, .grid, .power { grid-template-columns: 1fr; }
   .cols { gap: 28px; padding: 48px 0; }
+  .power { gap: 28px; }
   h3.title { font-size: 28px; }
+  .desktop { height: 410px; margin-top: 40px; }
+  .desktop .panel { right: 50%; transform: translateX(50%); }
+  .menubar .hide-sm { display: none; }
 }
 </style>
 </head>
 <body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-laptop" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="11" rx="1.5"/><path d="M2 19h20"/></symbol>
+  <symbol id="i-display" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M9 20h6M12 16v4"/></symbol>
+  <symbol id="i-display2" viewBox="0 0 24 24"><rect x="2" y="6" width="12" height="9" rx="1.2"/><path d="M7 6V4.5A1.5 1.5 0 0 1 8.5 3h12A1.5 1.5 0 0 1 22 4.5v8a1.5 1.5 0 0 1-1.5 1.5H14M6 19h4M8 15v4"/></symbol>
+  <symbol id="i-power" viewBox="0 0 24 24"><path d="M12 3v9M6.6 6.6a8 8 0 1 0 10.8 0"/></symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></symbol>
+  <symbol id="i-speaker" viewBox="0 0 24 24"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z" fill="currentColor"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/></symbol>
+  <symbol id="i-login" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 12h8M13 8.5l3.5 3.5-3.5 3.5"/></symbol>
+  <symbol id="i-quit" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9 9l6 6M15 9l-6 6"/></symbol>
+  <symbol id="i-wifi" viewBox="0 0 24 24"><path d="M2.5 9a14 14 0 0 1 19 0M5.5 12.5a9.5 9.5 0 0 1 13 0M8.5 16a5 5 0 0 1 7 0"/><circle cx="12" cy="19" r="1" fill="currentColor"/></symbol>
+  <symbol id="i-battery" viewBox="0 0 24 24"><rect x="2" y="7.5" width="18" height="9" rx="2.5"/><rect x="4" y="9.5" width="12" height="5" rx="1" fill="currentColor" stroke="none"/><path d="M22 10.5v3"/></symbol>
+  <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 2L4.5 13.5H11L10 22l8.5-11.5H12z" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.8 2.8L16 10"/></symbol>
+</svg>
 
 <header>
   <div class="wrap">
@@ -153,6 +387,46 @@ footer a { color: var(--muted); margin: 0 8px; }
       Free, macOS 14 or later.
       <a href="https://github.com/pawisoon/ScreenOff">View on GitHub</a>
     </div>
+
+    <div class="desktop" role="img" aria-label="ScreenOff panel open from the menu bar, with the Studio Display turned off">
+      <div class="menubar">
+        <span class="item active"><svg class="i"><use href="#i-display"/></svg></span>
+        <span class="item"><svg class="i"><use href="#i-wifi"/></svg></span>
+        <span class="item"><svg class="i" style="font-size:20px"><use href="#i-battery"/></svg></span>
+        <span class="item hide-sm">Thu 23 Oct</span>
+        <span class="item">11:42</span>
+      </div>
+      <div class="panel">
+        <div class="head">Displays</div>
+        <div class="row">
+          <span class="chip"><svg class="i"><use href="#i-laptop"/></svg></span>
+          <span class="name"><b>Built-in Retina Display</b><small>Built-in · Main</small></span>
+          <span class="switch"></span>
+        </div>
+        <div class="row">
+          <span class="chip"><svg class="i"><use href="#i-display"/></svg></span>
+          <span class="name"><b>LG UltraFine</b><small>External</small></span>
+          <span class="switch"></span>
+        </div>
+        <div class="vol">
+          <svg class="i"><use href="#i-speaker"/></svg>
+          <span class="slider"><span style="width:40%"></span></span>
+          <em>40</em>
+        </div>
+        <div class="row">
+          <span class="chip off"><svg class="i"><use href="#i-display"/></svg></span>
+          <span class="name"><b>Studio Display</b><small>Off</small></span>
+          <span class="switch off"></span>
+        </div>
+        <hr>
+        <div class="action"><svg class="i"><use href="#i-display2"/></svg>Turn Off External Displays</div>
+        <div class="action hover"><svg class="i"><use href="#i-power"/></svg>Turn All Displays On</div>
+        <div class="action"><svg class="i"><use href="#i-moon"/></svg>Sleep All Displays</div>
+        <hr>
+        <div class="action"><svg class="i"><use href="#i-login"/></svg>Launch at Login<span class="switch"></span></div>
+        <div class="action"><svg class="i"><use href="#i-quit"/></svg>Quit ScreenOff<span class="key">⌘Q</span></div>
+      </div>
+    </div>
   </div>
 </header>
 
@@ -163,7 +437,7 @@ footer a { color: var(--muted); margin: 0 8px; }
   </div>
   <div>
     <h2>Why Bother?</h2>
-    <p>Dimming to zero still leaves the backlight glowing, and pulling the cable gets old fast. ScreenOff stops the signal, so the monitor goes into its own standby.</p>
+    <p>Dimming to zero leaves the backlight glowing, and the power button usually cuts charging too. ScreenOff only stops the signal, so the monitor sleeps and keeps powering your Mac.</p>
   </div>
   <div>
     <h2>Why Trust ScreenOff?</h2>
@@ -172,30 +446,69 @@ footer a { color: var(--muted); margin: 0 8px; }
 </div>
 
 <section class="band">
+  <div class="wrap power">
+    <div>
+      <h3 class="title">Your Mac Keeps Charging</h3>
+      <p>ScreenOff stops the video signal and nothing else. The monitor stays powered in standby, so the USB-C or Thunderbolt cable keeps doing its other jobs.</p>
+      <p>Switch a monitor off with its power button, or over DDC, and most of them drop all of this along with the picture.</p>
+      <ul>
+        <li><svg class="i"><use href="#i-check"/></svg>Power Delivery keeps charging your MacBook</li>
+        <li><svg class="i"><use href="#i-check"/></svg>Thunderbolt and USB ports on the monitor stay connected</li>
+        <li><svg class="i"><use href="#i-check"/></svg>Phones and accessories plugged into the monitor keep charging</li>
+      </ul>
+    </div>
+    <svg class="scene" viewBox="0 0 440 300" role="img" aria-label="A MacBook connected to a monitor that is off, still charging over the cable">
+      <!-- monitor, screen off -->
+      <rect class="dev" x="150" y="20" width="270" height="170" rx="10"/>
+      <rect class="off" x="158" y="28" width="254" height="154" rx="5"/>
+      <rect class="dev" x="270" y="190" width="30" height="40"/>
+      <rect class="dev" x="235" y="228" width="100" height="8" rx="4"/>
+      <circle cx="400" cy="178" r="2.5" fill="#ff9f0a"/>
+      <text class="faint" x="285" y="110" text-anchor="middle">Off</text>
+      <!-- laptop, screen on -->
+      <defs>
+        <linearGradient id="lit" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#8ec5fc"/><stop offset="0.55" stop-color="#b8a6f5"/><stop offset="1" stop-color="#f3b1c8"/>
+        </linearGradient>
+      </defs>
+      <rect class="dev" x="14" y="166" width="150" height="96" rx="7"/>
+      <rect x="20" y="172" width="138" height="84" rx="3" fill="url(#lit)"/>
+      <path class="dev" d="M2 264h174a0 0 0 0 1 0 0l-6 8H8l-6-8z"/>
+      <!-- cable from laptop to monitor -->
+      <path class="cable" d="M176 262 C 230 262, 250 262, 280 236"/>
+      <path class="flow" d="M280 236 C 250 262, 230 262, 176 262"/>
+      <rect class="tag" x="190" y="276" width="128" height="22" rx="11"/>
+      <svg x="198" y="280" width="14" height="14" viewBox="0 0 24 24"><path d="M13 2L4.5 13.5H11L10 22l8.5-11.5H12z" fill="#34c759"/></svg>
+      <text x="216" y="292">Still charging</text>
+    </svg>
+  </div>
+</section>
+
+<section class="plain">
   <div class="wrap">
     <h3 class="title">Features</h3>
     <div class="grid">
-      <div class="card">
+      <div class="card" style="background:var(--band)">
         <h4>Works With<br>Any Monitor</h4>
         <p>Studio Display, built-in panels, and monitors that ignore DDC power commands or drop off the bus when you try.</p>
       </div>
-      <div class="card">
+      <div class="card" style="background:var(--band)">
         <h4>Windows<br>Move Over</h4>
         <p>macOS treats a display that's off as unplugged, so your windows move to the screens you're using and come back later.</p>
       </div>
-      <div class="card">
+      <div class="card" style="background:var(--band)">
         <h4>Monitor<br>Volume</h4>
         <p>A volume slider and mute for monitor speakers over DDC, for HDMI and DisplayPort audio that macOS won't let you adjust.</p>
       </div>
-      <div class="card">
+      <div class="card" style="background:var(--band)">
         <h4>One Click<br>for Externals</h4>
         <p>Turn off every external display at once, then bring them all back.</p>
       </div>
-      <div class="card">
+      <div class="card" style="background:var(--band)">
         <h4>Hard to<br>Get Stuck</h4>
         <p>The last active display can't be turned off, and quitting the app turns everything back on.</p>
       </div>
-      <div class="card">
+      <div class="card" style="background:var(--band)">
         <h4>Launch<br>at Login</h4>
         <p>Lives in the menu bar and starts with your Mac if you want it to.</p>
       </div>
@@ -203,23 +516,28 @@ footer a { color: var(--muted); margin: 0 8px; }
   </div>
 </section>
 
-<section class="plain">
+<section class="band">
   <div class="wrap">
     <h3 class="title">From the Terminal</h3>
-<pre><span class="c"># show displays and their state</span>
-screenoff list
-
-<span class="c"># any part of the name works, case doesn't matter</span>
-screenoff off lg
-screenoff on
-
-<span class="c"># monitor speaker volume</span>
-screenoff volume lg 40</pre>
-    <p class="note">The CLI and the menu bar app share state, so either one can turn back on what the other turned off.</p>
+    <div class="term" role="img" aria-label="Terminal running screenoff commands">
+      <div class="bar"><span class="dots"><i></i><i></i><i></i></span>zsh</div>
+<pre><span class="p">~ %</span> screenoff list
+<span class="o">ID  STATE  NAME
+1   on     Built-in Retina Display  [main, built-in]
+2   on     LG UltraFine
+3   on     Studio Display</span>
+<span class="p">~ %</span> screenoff off studio
+<span class="o">Studio Display -> off</span>
+<span class="p">~ %</span> screenoff volume lg 40
+<span class="o">LG UltraFine: 40/100</span>
+<span class="p">~ %</span> screenoff on
+<span class="o">All displays are on.</span></pre>
+    </div>
+    <p class="note">Any part of a display's name works, and case doesn't matter. The CLI and the menu bar app share state, so either one can turn back on what the other turned off.</p>
   </div>
 </section>
 
-<section class="band sponsor">
+<section class="plain sponsor">
   <div class="wrap">
     <h3 class="title">Support ScreenOff</h3>
     <p>ScreenOff is free and always will be. If it saves you some time or a bit of power, you can sponsor its development on GitHub.</p>

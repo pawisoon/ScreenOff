@@ -10,6 +10,8 @@ ScreenOff software-disconnects a display: macOS stops sending it a signal, so th
 
 While a display is off, macOS treats it as unplugged, so windows move to your other screens and come back when it is turned on again. Mouse movement does not wake it; use the menu or `screenoff on`.
 
+Only the video signal stops. The monitor stays powered, so USB-C Power Delivery keeps charging your Mac and the monitor's Thunderbolt and USB ports keep working. Turning a monitor off with its power button or over DDC usually cuts those too.
+
 ## Install
 
 Download the DMG from [Releases](https://github.com/pawisoon/ScreenOff/releases/latest) and drag ScreenOff to Applications.
