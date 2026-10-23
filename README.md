@@ -79,3 +79,7 @@ Not App Store eligible: there is no public API for disabling a display.
 ## Notes
 
 Display control uses the private `CGSConfigureDisplayEnabled` (SkyLight), resolved at runtime.
+
+## License
+
+MIT
