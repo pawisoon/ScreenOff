@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ScreenOff</title>
-<meta name="description" content="Turn individual displays off on your Mac from the menu bar or the command line. Charging and USB-C keep working.">
+<meta name="description" content="Turn individual displays off on your Mac from the menu bar or the command line. USB-C charging keeps working.">
 <meta property="og:title" content="ScreenOff">
-<meta property="og:description" content="Turn individual displays off on your Mac from the menu bar or the command line. Charging and USB-C keep working.">
+<meta property="og:description" content="Turn individual displays off on your Mac from the menu bar or the command line. USB-C charging keeps working.">
 <meta property="og:image" content="icon.png">
 <link rel="icon" href="favicon.png">
 <style>
@@ -449,12 +449,12 @@ footer a { color: var(--muted); margin: 0 8px; }
   <div class="wrap power">
     <div>
       <h3 class="title">Your Mac Keeps Charging</h3>
-      <p>ScreenOff stops the video signal and nothing else. The monitor stays powered in standby, so the USB-C or Thunderbolt cable keeps doing its other jobs.</p>
-      <p>Switch a monitor off with its power button, or over DDC, and most of them drop all of this along with the picture.</p>
+      <p>ScreenOff stops the video signal and nothing else. The monitor stays powered in standby, so Power Delivery over USB-C keeps charging your MacBook.</p>
+      <p>Switch a monitor off with its power button, or over DDC, and most of them stop charging along with the picture.</p>
       <ul>
-        <li><svg class="i"><use href="#i-check"/></svg>Power Delivery keeps charging your MacBook</li>
-        <li><svg class="i"><use href="#i-check"/></svg>Thunderbolt and USB ports on the monitor stay connected</li>
-        <li><svg class="i"><use href="#i-check"/></svg>Phones and accessories plugged into the monitor keep charging</li>
+        <li><svg class="i"><use href="#i-check"/></svg>USB-C Power Delivery keeps working</li>
+        <li><svg class="i"><use href="#i-check"/></svg>Your MacBook keeps charging from the monitor</li>
+        <li><svg class="i"><use href="#i-check"/></svg>No unplugging, no second charger</li>
       </ul>
     </div>
     <svg class="scene" viewBox="0 0 440 300" role="img" aria-label="A MacBook connected to a monitor that is off, still charging over the cable">
@@ -477,9 +477,9 @@ footer a { color: var(--muted); margin: 0 8px; }
       <!-- cable from laptop to monitor -->
       <path class="cable" d="M176 262 C 230 262, 250 262, 280 236"/>
       <path class="flow" d="M280 236 C 250 262, 230 262, 176 262"/>
-      <rect class="tag" x="190" y="276" width="128" height="22" rx="11"/>
-      <svg x="198" y="280" width="14" height="14" viewBox="0 0 24 24"><path d="M13 2L4.5 13.5H11L10 22l8.5-11.5H12z" fill="#34c759"/></svg>
-      <text x="216" y="292">Still charging</text>
+      <rect class="tag" x="176" y="276" width="200" height="22" rx="11"/>
+      <svg x="184" y="280" width="14" height="14" viewBox="0 0 24 24"><path d="M13 2L4.5 13.5H11L10 22l8.5-11.5H12z" fill="#34c759"/></svg>
+      <text x="202" y="292">Still charging over USB-C</text>
     </svg>
   </div>
 </section>
