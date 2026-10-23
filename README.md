@@ -2,7 +2,9 @@
 
 # ScreenOff
 
-Menu bar app + CLI for turning individual displays off on macOS — no backlight, no power cut.
+Menu bar app and CLI for turning individual displays off on macOS. No backlight, no power cut.
+
+[Website](https://screenoff.pawels-apps.workers.dev) · [Download](https://github.com/pawisoon/ScreenOff/releases/latest) · [Sponsor](https://github.com/sponsors/pawisoon)
 
 ScreenOff software-disconnects a display: macOS stops sending it a signal, so the monitor drops into its own power-saving mode. This works on any monitor, including ones without DDC power control (Apple Studio Display, built-in panels) and ones that fall off the bus when powered off over DDC (some LG UltraFine models).
 
@@ -10,7 +12,9 @@ While a display is off, macOS treats it as unplugged, so windows move to your ot
 
 ## Install
 
-Requires macOS 14+ and the Swift toolchain (Xcode or Command Line Tools).
+Download the DMG from [Releases](https://github.com/pawisoon/ScreenOff/releases/latest) and drag ScreenOff to Applications.
+
+To build from source instead you need macOS 14+ and the Swift toolchain (Xcode or Command Line Tools):
 
 ```bash
 ./scripts/install.sh
@@ -54,6 +58,8 @@ swift test
 ./scripts/build-app.sh         # -> build/ScreenOff.app
 swift scripts/make-icon.swift  # regenerate Resources/AppIcon.icns
 ```
+
+The website is the static page in `docs/`. GitHub Pages serves it from `main`, and `npx wrangler deploy` publishes it to Cloudflare.
 
 ## Release
 

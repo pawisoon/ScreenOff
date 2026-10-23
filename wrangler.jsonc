@@ -1,0 +1,14 @@
+// Serves docs/ as the website on Cloudflare (screenoff.<subdomain>.workers.dev).
+// GitHub Pages serves the same folder at pawisoon.github.io/ScreenOff.
+{
+  "name": "screenoff",
+  "compatibility_date": "2026-08-01",
+  "assets": {
+    "directory": "./docs"
+  }
+  // Once the domain is on Cloudflare, uncomment and run `npx wrangler deploy`:
+  // "routes": [
+  //   { "pattern": "screenoff.app", "custom_domain": true },
+  //   { "pattern": "www.screenoff.app", "custom_domain": true }
+  // ]
+}
