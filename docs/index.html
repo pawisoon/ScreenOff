@@ -338,6 +338,8 @@ pre .o { color: var(--muted); }
 .sponsor { text-align: center; }
 .sponsor p { color: var(--muted); max-width: 560px; margin: 0 auto 24px; }
 .sponsor .download { background: #db61a2; }
+.sponsor .buttons { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.sponsor .download.secondary { background: transparent; color: var(--text); box-shadow: inset 0 0 0 1.5px var(--line); }
 
 footer {
   border-top: 1px solid var(--line);
@@ -540,8 +542,12 @@ footer a { color: var(--muted); margin: 0 8px; }
 <section class="plain sponsor">
   <div class="wrap">
     <h3 class="title">Support ScreenOff</h3>
-    <p>ScreenOff is free and always will be. If it saves you some time or a bit of power, you can sponsor its development on GitHub.</p>
-    <a class="download" href="https://github.com/sponsors/pawisoon">Sponsor</a>
+    <p>ScreenOff is free and always will be. If it saves you some time or a bit of power, you can support its development.</p>
+    <div class="buttons">
+      <a class="download" href="https://github.com/sponsors/pawisoon">Sponsor on GitHub</a>
+      <a class="download secondary" href="https://buymeacoffee.com/pawisoon">Buy Me a Coffee</a>
+      <a class="download secondary" href="https://suppi.pl/pawels">Suppi</a>
+    </div>
   </div>
 </section>
 
